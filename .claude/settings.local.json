@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"G:\\\\My Documents\\\\Desktop\\\\Student Productivity Management System\" -Recurse -Force)",
+      "Bash(Select-Object -Property FullName, PSIsContainer)",
+      "Bash(Sort-Object FullName)",
+      "Bash(ConvertTo-Json -Depth 100)",
+      "Bash(out-string)"
+    ]
+  }
+}
