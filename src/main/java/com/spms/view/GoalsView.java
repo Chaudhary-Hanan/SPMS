@@ -226,11 +226,11 @@ public class GoalsView {
     private void openGoalDialog(Goal existing) {
         Dialog<Goal> dlg = new Dialog<>();
         dlg.setTitle(existing == null ? "New Goal" : "Edit Goal");
+        dlg.setHeaderText(existing == null ? "🎯 Enter new goal details" : "🎯 Update goal details");
         dlg.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-        dlg.getDialogPane().setStyle("-fx-background-color: #1a1b2e; -fx-border-color: #353655;");
 
         GridPane grid = new GridPane();
-        grid.setHgap(12); grid.setVgap(12); grid.setPadding(new Insets(20));
+        grid.setHgap(16); grid.setVgap(16); grid.setPadding(new Insets(24));
 
         TextField titleFld = UIFactory.createTextField("Goal title *");
         TextArea  descFld  = UIFactory.createTextArea("Brief description (optional)", 2);
@@ -262,11 +262,17 @@ public class GoalsView {
         GridPane.setHgrow(titleFld, Priority.ALWAYS);
 
         dlg.getDialogPane().setContent(grid);
+
+        final javafx.scene.control.Button btOk = (javafx.scene.control.Button) dlg.getDialogPane().lookupButton(ButtonType.OK);
+        btOk.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
+            if (titleFld.getText().isBlank()) {
+                UIFactory.showError("Goal title is required.");
+                event.consume();
+            }
+        });
+
         dlg.setResultConverter(btn -> {
             if (btn != ButtonType.OK) return null;
-            if (titleFld.getText().isBlank()) {
-                UIFactory.showError("Goal title is required."); return null;
-            }
             double target = 1.0;
             try { target = Double.parseDouble(targetFld.getText().trim()); } catch (Exception ignored) {}
 

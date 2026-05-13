@@ -107,7 +107,7 @@ public class AnalyticsView {
         BarChart<String, Number> chart = new BarChart<>(xAxis, yAxis);
         chart.setTitle("");
         chart.setLegendVisible(false);
-        chart.setAnimated(false);
+        chart.setAnimated(true);
         chart.setPrefHeight(260);
         chart.setBarGap(4);
         chart.setCategoryGap(14);
@@ -117,6 +117,14 @@ public class AnalyticsView {
         data.forEach((day, hours) -> series.getData().add(
                 new XYChart.Data<>(day, Math.round(hours * 10.0) / 10.0)));
         chart.getData().add(series);
+
+        for (XYChart.Data<String, Number> d : series.getData()) {
+            if (d.getNode() != null) {
+                Tooltip t = new Tooltip(d.getYValue() + " hours");
+                Tooltip.install(d.getNode(), t);
+                d.getNode().setStyle("-fx-cursor: hand;");
+            }
+        }
 
         return UIFactory.createCard("📅  Weekly Study Hours", chart);
     }
@@ -131,23 +139,25 @@ public class AnalyticsView {
             return empty;
         }
 
-        CategoryAxis xAxis = new CategoryAxis();
-        NumberAxis   yAxis = new NumberAxis();
-        yAxis.setLabel("Hours");
-        yAxis.setMinorTickVisible(false);
-
-        BarChart<String, Number> chart = new BarChart<>(xAxis, yAxis);
+        PieChart chart = new PieChart();
+        chart.setAnimated(true);
+        chart.setLabelsVisible(true);
         chart.setLegendVisible(false);
-        chart.setAnimated(false);
         chart.setPrefHeight(260);
-        chart.setBarGap(4);
-        chart.setCategoryGap(14);
         chart.getStyleClass().add("spms-chart");
 
-        XYChart.Series<String, Number> series = new XYChart.Series<>();
-        data.forEach((subj, hours) -> series.getData().add(
-                new XYChart.Data<>(subj, Math.round(hours * 10.0) / 10.0)));
-        chart.getData().add(series);
+        data.forEach((subj, hours) -> {
+            PieChart.Data slice = new PieChart.Data(subj, Math.round(hours * 10.0) / 10.0);
+            chart.getData().add(slice);
+        });
+
+        for (PieChart.Data d : chart.getData()) {
+            if (d.getNode() != null) {
+                Tooltip t = new Tooltip(d.getName() + "\n" + d.getPieValue() + " hours");
+                Tooltip.install(d.getNode(), t);
+                d.getNode().setStyle("-fx-cursor: hand;");
+            }
+        }
 
         return UIFactory.createCard("📚  Study Hours by Subject", chart);
     }

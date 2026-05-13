@@ -37,8 +37,13 @@ public class MainWindow {
     private RemindersView    remindersView;
     private AnalyticsView    analyticsView;
     private ExamsView        examsView;
+    private AssignmentsView  assignmentsView;
+
+    private static MainWindow instance;
+    public static MainWindow getInstance() { return instance; }
 
     public MainWindow(Stage stage) {
+        instance = this;
         this.stage = stage;
         build();
     }
@@ -97,11 +102,12 @@ public class MainWindow {
         Button btnGoals    = navButton("🎯", "Goals",           this::navigateGoals);
         Button btnNotes    = navButton("📝", "Notes",           this::navigateNotes);
         Button btnRemind   = navButton("🔔", "Reminders",       this::navigateReminders);
+        Button btnTasks    = navButton("📋", "Tasks",           this::navigateTasks);
         Button btnAnalytics= navButton("📊", "Analytics",       this::navigateAnalytics);
-        Button btnExams    = navButton("📋", "Exams",           this::navigateExams);
+        Button btnExams    = navButton("🎓", "Exams",           this::navigateExams);
 
         navBox.getChildren().addAll(navHeader,
-                btnDash, btnPlanner, btnTimer, btnGoals,
+                btnDash, btnPlanner, btnTasks, btnTimer, btnGoals,
                 btnNotes, btnRemind, btnAnalytics, btnExams);
 
         // Spacer
@@ -179,12 +185,12 @@ public class MainWindow {
         showView(studyPlannerView.build());
     }
 
-    private void navigateTimer() {
+    public void navigateTimer() {
         if (focusTimerView == null) focusTimerView = new FocusTimerView();
         showView(focusTimerView.build());
     }
 
-    private void navigateGoals() {
+    public void navigateGoals() {
         if (goalsView == null) goalsView = new GoalsView();
         showView(goalsView.build());
     }
@@ -204,9 +210,14 @@ public class MainWindow {
         showView(analyticsView.build());
     }
 
-    private void navigateExams() {
+    public void navigateExams() {
         if (examsView == null) examsView = new ExamsView();
         showView(examsView.build());
+    }
+
+    public void navigateTasks() {
+        if (assignmentsView == null) assignmentsView = new AssignmentsView();
+        showView(assignmentsView.build());
     }
 
     private void showView(Node view) {

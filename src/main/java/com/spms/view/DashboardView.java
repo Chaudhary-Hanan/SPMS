@@ -85,8 +85,14 @@ public class DashboardView {
     // ── Body ─────────────────────────────────────────────────────────────────
 
     private Node buildBody() {
-        VBox body = new VBox(20);
+        VBox body = new VBox(24);
         body.setPadding(new Insets(20, 28, 28, 28));
+
+        // Hero Banner
+        body.getChildren().add(buildHeroBanner());
+
+        // Quick Actions
+        body.getChildren().add(buildQuickActions());
 
         // Stat cards row
         body.getChildren().add(buildStatsRow());
@@ -111,6 +117,40 @@ public class DashboardView {
         columns.getChildren().addAll(leftCol, rightCol);
         body.getChildren().add(columns);
         return body;
+    }
+
+    private Node buildHeroBanner() {
+        VBox banner = new VBox(8);
+        banner.getStyleClass().add("hero-banner");
+        
+        Label title = new Label("Ready to conquer the day?");
+        title.getStyleClass().add("hero-title");
+        
+        Label subtitle = new Label("\"Success is the sum of small efforts, repeated day in and day out.\"");
+        subtitle.getStyleClass().add("hero-subtitle");
+        
+        banner.getChildren().addAll(title, subtitle);
+        return banner;
+    }
+
+    private Node buildQuickActions() {
+        HBox actions = new HBox(16);
+        actions.setAlignment(Pos.CENTER_LEFT);
+        
+        Button btnTask = new Button("➕ Add/View Tasks");
+        btnTask.getStyleClass().add("quick-action-btn");
+        btnTask.setOnAction(e -> MainWindow.getInstance().navigateTasks());
+
+        Button btnTimer = new Button("⏱ Start Focus Timer");
+        btnTimer.getStyleClass().add("quick-action-btn");
+        btnTimer.setOnAction(e -> MainWindow.getInstance().navigateTimer());
+
+        Button btnGoal = new Button("🎯 Set New Goal");
+        btnGoal.getStyleClass().add("quick-action-btn");
+        btnGoal.setOnAction(e -> MainWindow.getInstance().navigateGoals());
+
+        actions.getChildren().addAll(btnTask, btnTimer, btnGoal);
+        return actions;
     }
 
     // ── Stat Cards ────────────────────────────────────────────────────────────
@@ -306,7 +346,7 @@ public class DashboardView {
         BarChart<String, Number> chart = new BarChart<>(xAxis, yAxis);
         chart.setTitle("");
         chart.setLegendVisible(false);
-        chart.setAnimated(false);
+        chart.setAnimated(true);
         chart.setPrefHeight(220);
         chart.setBarGap(4);
         chart.setCategoryGap(16);
@@ -316,6 +356,14 @@ public class DashboardView {
         weekData.forEach((day, hours) -> series.getData().add(
                 new XYChart.Data<>(day, Math.round(hours * 10.0) / 10.0)));
         chart.getData().add(series);
+
+        for (XYChart.Data<String, Number> data : series.getData()) {
+            if (data.getNode() != null) {
+                Tooltip t = new Tooltip(data.getYValue() + " hours");
+                Tooltip.install(data.getNode(), t);
+                data.getNode().setStyle("-fx-cursor: hand;");
+            }
+        }
 
         VBox card = UIFactory.createCard("📊  Study Hours This Week", chart);
         card.getStyleClass().add("dashboard-card");

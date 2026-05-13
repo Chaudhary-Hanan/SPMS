@@ -213,11 +213,11 @@ public class RemindersView {
     private void openReminderDialog(Reminder existing) {
         Dialog<Reminder> dlg = new Dialog<>();
         dlg.setTitle(existing == null ? "New Reminder" : "Edit Reminder");
+        dlg.setHeaderText(existing == null ? "🔔 Enter new reminder details" : "🔔 Update reminder details");
         dlg.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-        dlg.getDialogPane().setStyle("-fx-background-color: #1a1b2e; -fx-border-color: #353655;");
 
         GridPane grid = new GridPane();
-        grid.setHgap(12); grid.setVgap(12); grid.setPadding(new Insets(20));
+        grid.setHgap(16); grid.setVgap(16); grid.setPadding(new Insets(24));
 
         TextField titleFld  = UIFactory.createTextField("Reminder title *");
         TextArea  msgFld    = UIFactory.createTextArea("Detailed message (optional)", 3);
@@ -249,11 +249,17 @@ public class RemindersView {
         GridPane.setHgrow(titleFld, Priority.ALWAYS);
 
         dlg.getDialogPane().setContent(grid);
+
+        final javafx.scene.control.Button btOk = (javafx.scene.control.Button) dlg.getDialogPane().lookupButton(ButtonType.OK);
+        btOk.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
+            if (titleFld.getText().isBlank() || dateDp.getValue() == null) {
+                UIFactory.showError("Title and date are required.");
+                event.consume();
+            }
+        });
+
         dlg.setResultConverter(btn -> {
             if (btn != ButtonType.OK) return null;
-            if (titleFld.getText().isBlank() || dateDp.getValue() == null) {
-                UIFactory.showError("Title and date are required."); return null;
-            }
             LocalDateTime due;
             try {
                 due = LocalDateTime.of(dateDp.getValue(),

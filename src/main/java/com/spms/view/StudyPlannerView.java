@@ -210,13 +210,12 @@ public class StudyPlannerView {
     private void openPlanDialog(StudyPlan existing) {
         Dialog<StudyPlan> dialog = new Dialog<>();
         dialog.setTitle(existing == null ? "New Study Plan" : "Edit Study Plan");
+        dialog.setHeaderText(existing == null ? "📅 Create a new study plan" : "📅 Update study plan");
         dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-        dialog.getDialogPane().setStyle(
-                "-fx-background-color: #1a1b2e; -fx-border-color: #353655;");
 
         GridPane grid = new GridPane();
-        grid.setHgap(12); grid.setVgap(12);
-        grid.setPadding(new Insets(20));
+        grid.setHgap(16); grid.setVgap(16);
+        grid.setPadding(new Insets(24));
 
         TextField subjectFld  = UIFactory.createTextField("e.g. Mathematics");
         DatePicker deadlineDp = UIFactory.createDatePicker();
@@ -248,13 +247,19 @@ public class StudyPlannerView {
         GridPane.setHgrow(deadlineDp, Priority.ALWAYS);
 
         dialog.getDialogPane().setContent(grid);
-        dialog.setResultConverter(btn -> {
-            if (btn != ButtonType.OK) return null;
+
+        final javafx.scene.control.Button btOk = (javafx.scene.control.Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
+        btOk.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
             String subj = subjectFld.getText().trim();
             if (subj.isEmpty() || deadlineDp.getValue() == null) {
                 UIFactory.showError("Subject and Deadline are required.");
-                return null;
+                event.consume();
             }
+        });
+
+        dialog.setResultConverter(btn -> {
+            if (btn != ButtonType.OK) return null;
+            String subj = subjectFld.getText().trim();
             double hours = 2.0;
             try { hours = Double.parseDouble(hoursFld.getText().trim()); } catch (Exception ignored) {}
 

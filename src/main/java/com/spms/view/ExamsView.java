@@ -214,11 +214,11 @@ public class ExamsView {
     private void openExamDialog(Exam existing) {
         Dialog<Exam> dlg = new Dialog<>();
         dlg.setTitle(existing == null ? "Add Exam" : "Edit Exam");
+        dlg.setHeaderText(existing == null ? "📋 Enter new exam details" : "📋 Update exam details");
         dlg.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
-        dlg.getDialogPane().setStyle("-fx-background-color: #1a1b2e; -fx-border-color: #353655;");
 
         GridPane grid = new GridPane();
-        grid.setHgap(12); grid.setVgap(12); grid.setPadding(new Insets(20));
+        grid.setHgap(16); grid.setVgap(16); grid.setPadding(new Insets(24));
 
         TextField subjectFld  = UIFactory.createTextField("Subject name *");
         DatePicker dateDp     = UIFactory.createDatePicker();
@@ -246,11 +246,17 @@ public class ExamsView {
         GridPane.setHgrow(subjectFld, Priority.ALWAYS);
 
         dlg.getDialogPane().setContent(grid);
+
+        final javafx.scene.control.Button btOk = (javafx.scene.control.Button) dlg.getDialogPane().lookupButton(ButtonType.OK);
+        btOk.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
+            if (subjectFld.getText().isBlank() || dateDp.getValue() == null) {
+                UIFactory.showError("Subject and date are required.");
+                event.consume();
+            }
+        });
+
         dlg.setResultConverter(btn -> {
             if (btn != ButtonType.OK) return null;
-            if (subjectFld.getText().isBlank() || dateDp.getValue() == null) {
-                UIFactory.showError("Subject and date are required."); return null;
-            }
             LocalTime examTime = LocalTime.of(9, 0);
             try {
                 examTime = LocalTime.parse(timeFld.getText().trim(),
